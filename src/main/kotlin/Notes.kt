@@ -1,28 +1,14 @@
-class Notes {
+class Notes(override val text: String, override val title: String) : CrudService<Note> {
     private val notes = mutableListOf<Note>()
     private var noteId = 0
     private var commentId = 0
 
-    fun add(title: String, text: String): Int {
-        noteId += 1
-        val note = Note(title = title, text = text, noteId = noteId)
-        notes.add(note)
-        return note.noteId
+    override fun add(entity: Note): Note {
+        notes += entity
+        return notes.last()
     }
 
-    fun createComment(noteId: Int, message: String): Int {
-        for (note in notes) {
-            if (note.noteId == noteId) {
-                commentId += 1
-                val comment = Comment(commentId = commentId, noteId = noteId, message = message)
-                note.comments.add(comment)
-                return comment.noteId
-            }
-        }
-        return 0
-    }
-
-    fun delete(noteId: Int): Boolean {
+    override fun delete(notesId: Int): Boolean {
         for (note in notes) {
             if (note.noteId == noteId) {
                 val delNote = note.copy(isDelete = true)
@@ -34,41 +20,13 @@ class Notes {
         return false
     }
 
-    fun deleteComment(commentId: Int): Boolean {
-        for (note in notes) {
-            for (comment in note.comments) {
-                if (comment.commentId == commentId) {
-                    val delComment = comment.copy(isDelete = true)
-                    note.comments.remove(comment)
-                    note.comments.add(delComment)
-                    return true
-                }
-            }
-        }
-        return false
-    }
-
-    fun edit(noteId: Int, title: String, text: String): Boolean {
+    override fun edit(entry: Note): Boolean {
         for (note in notes) {
             if (note.noteId == noteId) {
                 val editNote = note.copy(title = title, text = text)
                 notes.remove(note)
                 notes.add(editNote)
                 return true
-            }
-        }
-        return false
-    }
-
-    fun editComment(commentId: Int, message: String): Boolean {
-        for (note in notes) {
-            for (comment in note.comments) {
-                if (comment.commentId == commentId) {
-                    val editComment = comment.copy(message = message)
-                    note.comments.remove(comment)
-                    note.comments.add(editComment)
-                    return true
-                }
             }
         }
         return false
@@ -90,7 +48,7 @@ class Notes {
         return getNotes
     }
 
-    fun getById(noteId: Int): Note {
+    override fun getById(noteId: Int): Note {
         for (note in notes) {
             if (note.noteId == noteId) {
                 return note
@@ -112,7 +70,7 @@ class Notes {
         throw NoteNotFoundException("no note with id $noteId")
     }
 
-    fun restoreComment(commentId: Int): Boolean {
+    override fun restore(id: Int): Boolean {
         for (note in notes) {
             for (comment in note.comments) {
                 if (comment.commentId == commentId) {
@@ -126,3 +84,7 @@ class Notes {
         return false
     }
 }
+
+
+
+
